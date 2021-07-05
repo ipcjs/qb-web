@@ -42,8 +42,8 @@ const store = new Vuex.Store<RootState>({
             delete payload.categories[key]
           }
         }
-        for (const [hash, torrent] of Object.entries(payload.torrents as Record<string, BaseTorrent>)) {
-          if (torrent.category.startsWith('.')) {
+        for (const [hash, torrent] of Object.entries(payload.torrents as Record<string, Partial<BaseTorrent>>)) {
+          if (torrent.category?.startsWith('.')) {
             delete payload.torrents[hash]
           }
         }
