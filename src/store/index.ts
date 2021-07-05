@@ -36,8 +36,8 @@ const store = new Vuex.Store<RootState>({
     updateMainData(state, payload) {
       state.rid = payload.rid;
       delete payload.rid;
-      if (process.env.VUE_APP_IGNORE_HIDDEN_CATEGORIE) {
-        for (const [key, categorie] of Object.entries(payload.categories as Record<string, Category>)) {
+      if (process.env.VUE_APP_IGNORE_HIDDEN_CATEGORIE === 'YES') {
+        for (const [key, categorie] of Object.entries((payload.categories ?? {}) as Record<string, Category>)) {
           if (categorie.name.startsWith('.')) {
             delete payload.categories[key]
           }
