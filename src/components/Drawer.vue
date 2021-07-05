@@ -73,6 +73,7 @@ import { StateType } from '@/consts';
 import SiteMap from '@/sites'
 import Component from 'vue-class-component';
 import { Prop, Emit } from 'vue-property-decorator';
+import { notEmpty } from '@/utils';
 
 const stateList = [
   {
@@ -158,9 +159,9 @@ export default class Drawer extends Vue {
 
   pcItems: MenuItem[] = [
     { icon: 'mdi-rss-box', title: 'RSS', click: () => this.updateOptions('showRss', true) },
-    { icon: 'mdi-cog-box', title: tr('settings'), click: () => this.updateOptions('showSettings', true) },
+    process.env.VUE_APP_HIDE_SETTINGS === 'YES' ? null : { icon: 'mdi-cog-box', title: tr('settings'), click: () => this.updateOptions('showSettings', true) },
     { icon: 'mdi-history', title: tr('label.switch_to_old_ui'), click: this.switchUi },
-  ]
+  ].filter(notEmpty)
 
   isDataReady!: boolean
   allTorrents!: Torrent[]

@@ -95,3 +95,7 @@ export function findSameNamedTorrents(allTorrents: Torrent[], torrents: Torrent[
 export function typed<T>(value: T): T {
   return value;
 }
+
+export function notEmpty<T>(value: T | null | undefined): value is T {
+  return value != null
+}
