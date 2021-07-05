@@ -12,6 +12,7 @@ import { torrentIsState } from '../utils';
 import searchEngineStore from './searchEngine';
 import { RootState } from './types';
 import api from '@/Api';
+import { BaseTorrent, Category } from '@/types';
 
 Vue.use(Vuex);
 
@@ -35,6 +36,18 @@ const store = new Vuex.Store<RootState>({
     updateMainData(state, payload) {
       state.rid = payload.rid;
       delete payload.rid;
+      if (process.env.VUE_APP_IGNORE_HIDDEN_CATEGORIE) {
+        for (const [key, categorie] of Object.entries(payload.categories as Record<string, Category>)) {
+          if (categorie.name.startsWith('.')) {
+            delete payload.categories[key]
+          }
+        }
+        for (const [hash, torrent] of Object.entries(payload.torrents as Record<string, BaseTorrent>)) {
+          if (torrent.category.startsWith('.')) {
+            delete payload.torrents[hash]
+          }
+        }
+      }
       if (payload.full_update) {
         delete payload.full_update;
         state.mainData = payload;
