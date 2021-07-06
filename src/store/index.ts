@@ -1,4 +1,4 @@
-import { cloneDeep, merge, map, groupBy, sortBy } from 'lodash';
+import { cloneDeep, merge, map, groupBy, sortBy, filter } from 'lodash';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import { computed, Ref } from '@vue/composition-api';
@@ -36,18 +36,6 @@ const store = new Vuex.Store<RootState>({
     updateMainData(state, payload) {
       state.rid = payload.rid;
       delete payload.rid;
-      if (process.env.VUE_APP_IGNORE_HIDDEN_CATEGORIE === 'YES') {
-        for (const [key, categorie] of Object.entries((payload.categories ?? {}) as Record<string, Category>)) {
-          if (categorie.name.startsWith('.')) {
-            delete payload.categories[key]
-          }
-        }
-        for (const [hash, torrent] of Object.entries(payload.torrents as Record<string, Partial<BaseTorrent>>)) {
-          if (torrent.category?.startsWith('.')) {
-            delete payload.torrents[hash]
-          }
-        }
-      }
       if (payload.full_update) {
         delete payload.full_update;
         state.mainData = payload;
@@ -95,15 +83,22 @@ const store = new Vuex.Store<RootState>({
         return [];
       }
 
-      return map(state.mainData.torrents, (value, key) => merge({}, value, { hash: key }));
+      const torrents = map(state.mainData.torrents, (value, key) => merge({}, value, { hash: key }));
+      if (process.env.VUE_APP_IGNORE_HIDDEN_CATEGORIE === 'YES') {
+        return filter(torrents, it => !it.category.startsWith('.'))
+      }
+      return torrents
     },
     allCategories(state) {
       if (!state.mainData) {
         return [];
       }
 
-      const categories = map(state.mainData.categories,
+      let categories = map(state.mainData.categories,
         (value, key) => merge({}, value, { key }));
+      if (process.env.VUE_APP_IGNORE_HIDDEN_CATEGORIE === 'YES') {
+        categories = filter(categories, it => !it.name.startsWith('.'))
+      }
       return sortBy(categories, 'name');
     },
     torrentGroupByCategory(state, getters) {
